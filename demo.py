@@ -1,12 +1,14 @@
 import re
-file = open("Alto Hospicio.txt",'r',encoding='utf8')
+origen = open("Alto Hospicio.txt",'r',encoding='utf8')
+destino = open("Alto Hospicio.csv", "w")
 
-for line in file:
+for line in origen:
 	if not "ELECTORAL" in line:
 		if not "PROVINCIA" in line:
 			line = re.sub('  +',';',line)
 			if line.startswith(";"):
 				nada = ""
 			else:
-				print(line)
-file.close()
+				destino.write(line)
+origen.close()
+destino.close()
