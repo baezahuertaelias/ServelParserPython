@@ -1,9 +1,12 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-
 import re
-file = open("Alto del Carmen.txt",'r',encoding='utf8')
+file = open("Alto Hospicio.txt",'r',encoding='utf8')
 
 for line in file:
-	print(re.sub('  +',';',line))
+	if not "ELECTORAL" in line:
+		if not "PROVINCIA" in line:
+			line = re.sub('  +',';',line)
+			if line.startswith(";"):
+				nada = ""
+			else:
+				print(line)
 file.close()
