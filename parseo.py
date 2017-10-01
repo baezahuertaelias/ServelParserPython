@@ -4,6 +4,11 @@ import re
 import os
 #Importando la barra de progreso
 from progress.bar import ShadyBar
+import mysql.connector as mariadb
+
+mariadb_connection = mariadb.connect(user='root', password='root', database='servel')
+cursor = mariadb_connection.cursor()
+
 
 #Cargo la barra de progreso
 bar = ShadyBar('Cargantres')
@@ -34,8 +39,11 @@ for files in directorio:
 		contador+=1
 
 #Declarando la barra y el largo del contador anterior
-bar = ShadyBar('Prcocesando archivos', max=contador)
+bar = ShadyBar('Prcocesando archivos', max=contador, suffix='%(percent).1f%% - %(eta)ds')
 #Recorriendo el array con los archivos
+
+chileno ={}
+
 for files in directorio:
 	#Filtro los archivos planos
 	if files.endswith('.txt'):
@@ -50,9 +58,22 @@ for files in directorio:
 					line = re.sub('  +',';',line)
 					#Cuando encuentra una fila mal formateada, no la agrego al csv
 					if not line.startswith(";"):
-						#Agrego al csv
-						#destino.write(line)
-						nada = ""
+						hola = line.split(";")
+						if len(hola) > 1 and len(hola[3]) > 10:
+							chileno['nombre'] = hola[0]
+							chileno['rut'] = hola[1]
+							chileno['sexo'] = hola[2]
+							chileno['direccion'] = hola[3]
+							if len(hola) == 4:
+								chileno['comuna'] = " "
+							else:
+								chileno['comuna'] = hola[4]
+						try:
+							cursor.execute("INSERT INTO chilenos (nombre,rut,sexo,direccion,comuna) VALUES (%s,%s,%s,%s,%s)", (chileno['nombre'],chileno['rut'],chileno['sexo'],chileno['direccion'],chileno['comuna']))
+							#print ("Insertando a: " + chileno['nombre'])
+						except mariadb.Error as error:
+							print("Error: {}".format(error))
+						mariadb_connection.commit()
 		origen.close()
 	else:
 		print("la carpeta \"servel\"no existe")
